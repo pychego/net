@@ -32,6 +32,7 @@ parser.add_argument("--classes", type=int, default=6) # 6 classes
 
 # dataset setting 修改数据集和Dataset类, 输入类别
 data = pd.read_csv('Dataset10/at_add.csv')
+
 train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)
 parser.add_argument("--train_dataset", default=train_data)
 parser.add_argument("--test_dataset", default=test_data)
