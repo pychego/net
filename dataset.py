@@ -14,9 +14,9 @@ class DealDataset(Dataset):
         # 发送时间, 传输时间, 发送者位置和速度, 接受者位置和速度, 消息ID
         # remove the 13th column
         # convert to tensor
-        self.x = torch.from_numpy(data[:, 0:16])  # 前13列是特征
+        self.x = torch.from_numpy(data[:, 0:784])  # 前13列是特征
         # self.x = numpy.delete(data, 13, axis=1)
-        self.label = torch.from_numpy(data[:, 16])  # 第14列是标签
+        self.label = torch.from_numpy(data[:, 784])  # 第14列是标签
 
 
     def __len__(self):
