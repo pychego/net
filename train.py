@@ -81,7 +81,7 @@ parser.add_argument("--num_workers", type=int, default=0)
 
 # optimizer setting
 parser.add_argument("--lr", type=float, default=0.01)
-parser.add_argument("--epochs", type=int, default=200)
+parser.add_argument("--epochs", type=int, default=5)
 
 # global setting
 parser.add_argument("--ckpt", type=str, default="./ckpt")
@@ -182,18 +182,6 @@ def test(model, test_loader):
     input_map = lambda x: x.float().to(device)
     for row, label in test_loader:
         row, label = map(input_map, (row, label))
-        # # label = label.reshape(-1).long()
-        # output = model(row)
-        # y_true = np.concatenate([y_true, label.cpu().numpy()])
-        # if y_pred is None: y_pred = output.cpu().numpy()
-        # else:
-        #     y_pred = np.concatenate([y_pred, output.cpu().numpy()])
-
-
-        # total += len(row)
-        # # total += label.shape[0]
-        # accuracy += ((output.argmax(dim=1) - label.squeeze()) == 0).sum()
-        row, label = map(input_map, (row, label))
         # label = label.reshape(-1).long()
         # 得到神经网络的原始输出
         output = model(row)
@@ -206,7 +194,7 @@ def test(model, test_loader):
     cm = confusion_matrix(y_true, y_pred, labels=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     
     # print(type(accuracy.numpy()))
-    acry = np.sum(np.diag(cm)) / np.sum(cm[1:,:])
+    acry = np.sum(np.diag(cm)) / np.sum(cm)
     # print(f'test sum: {str(total)}')
     print(f'\n test accuracy: {str(acry)}')
     return acry
@@ -238,7 +226,8 @@ def evaluate(model, test_loader):
     report = classification_report(y_true, y_pred, labels=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], digits=3)
     print(report)
 
-    all_at = np.sum(cm[1:,:])
+    # 计算cm的元素之和
+    all_at = np.sum(cm)
     right_at = np.sum(np.diag(cm))   # 对角线元素之和
     at_accuracy = right_at / all_at
     print('最终准确率{}'.format(at_accuracy))  
