@@ -13,10 +13,10 @@ class LinearBlock(nn.Module):
 
         self.linear = nn.Linear(in_features=in_features, out_features=out_features, *args, **kwargs)
         # self.batchnorm = nn.BatchNorm1d(out_features)
-        self.leakyrelu = nn.LeakyReLU(0.2)
+        self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
-        return self.leakyrelu(self.linear(x))
+        return self.relu(self.linear(x))
 
 
 class FC(nn.Module):
@@ -32,11 +32,11 @@ class FC(nn.Module):
         self.train_loss = []
         self.validation_loss = []
         self.block = nn.Sequential(
-            LinearBlock(in_features, 32),
-            LinearBlock(32, 64),
-            LinearBlock(64, 32),
-            LinearBlock(32, 20),
-            nn.Linear(20, out_features),
+            LinearBlock(in_features, 784),
+            LinearBlock(784, 400),
+            LinearBlock(400, 169),
+            LinearBlock(169, 49),
+            nn.Linear(49, out_features),
         )
 
     def forward(self, x):
@@ -71,34 +71,3 @@ class FC(nn.Module):
         plt.legend()
         plt.savefig('loss__内部.jpg', dpi=1000)
         plt.show()
-
-
-class TimeSequence(nn.Module):
-
-    def __init__(self, features: int, hidden_size=16, num_layers=2, classes: int=2):
-        super().__init__()
-        self.lstm = nn.RNN(
-            input_size=features, hidden_size=hidden_size, num_layers=num_layers, batch_first=True
-        )
-        self.linear_proj = nn.Sequential(
-            LinearBlock(hidden_size, classes),
-            nn.Softmax(dim=1)
-        )
-
-    def forward(self, x):
-        x, _ = self.lstm(x)
-        x = self.linear_proj(x)
-        x = x.reshape(-1, x.shape[-1])
-        return x
-
-
-if __name__ == '__main__':
-    # feature dim, hidden size, layers
-    lstm = nn.LSTM(14, 20, 2, batch_first=True)
-    # batch, seq, feature
-    input = torch.randn(5, 40, 14)
-    h0 = torch.randn(2, 5, 20)
-    c0 = torch.randn(2, 5, 20)
-    output, (hn, cn) = lstm(input, (h0, c0))
-    print(output.shape) # batch, seq, 20
-    # B, C ; B, C, L
